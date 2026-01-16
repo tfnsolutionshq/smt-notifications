@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'identity' => [
+        'base_url' => env('IDENTITY_BASE_URL', 'http://127.0.0.1:8000'),
+        'api_key' => env('IDENTITY_API_KEY'),
+    ],
+
+
 ];
