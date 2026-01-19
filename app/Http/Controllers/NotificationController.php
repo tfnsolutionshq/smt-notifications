@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\NotificationService;
 use App\Mail\ExternalMemoShareEmail;
+use App\Mail\ExternalMemoForwardedEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -159,6 +160,42 @@ class NotificationController extends Controller
                     $validated['data']['status'],
                     $validated['data']['timeline'] ?? [],
                     $validated['data']['message'] ?? null
+                ));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Email send failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send email'
+            ], 500);
+        }
+    }
+
+    public function forwardMemo(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'to' => 'required|email',
+                'subject' => 'required|string',
+                'template' => 'required|string',
+                'data' => 'required|array'
+            ]);
+
+            if ($validated['template'] === 'external_memo_forwarded') {
+                Mail::to($validated['to'])->send(new ExternalMemoForwardedEmail(
+                    $validated['data']['recipient_name'],
+                    $validated['data']['forwarded_by'],
+                    $validated['data']['memo_subject'],
+                    $validated['data']['memo_reference'],
+                    $validated['data']['sender_organization'],
+                    $validated['data']['remarks'] ?? null,
+                    $validated['data']['tracking_url']
                 ));
             }
 
