@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
     Route::post('notifications/send-to-role', [NotificationController::class, 'sendToRole']);
     Route::post('share-memo', [NotificationController::class, 'shareMemo']);
     Route::post('forward-memo', [NotificationController::class, 'forwardMemo']);
+    Route::post('send-otp', [NotificationController::class, 'sendOtp']);
 
     Route::get('test', function () {
         Mail::to('promisedeco24@gmail.com')->send(new LoginSuccessEmail(

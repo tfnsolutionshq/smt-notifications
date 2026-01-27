@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\NotificationService;
 use App\Mail\ExternalMemoShareEmail;
 use App\Mail\ExternalMemoForwardedEmail;
+use App\Mail\PasswordResetOtpEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -23,7 +24,7 @@ class NotificationController extends Controller
         try {
             $validated = $request->validate([
                 'service' => 'required|string',
-                'action' => 'required|in:login,register,reset_password_request,reset_password,memo_created,workflow_step_moved,approval_action_taken,workflow_completed',
+                'action' => 'required|in:login,register,reset_password_request,reset_password,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,forgot_password_otp',
                 'recipient' => 'required',
                 'data' => 'required|array',
                 'type' => 'required|in:email'
@@ -209,6 +210,34 @@ class NotificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send email'
+            ], 500);
+        }
+    }
+
+    public function sendOtp(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'to' => 'required|email',
+                'data' => 'required|array'
+            ]);
+
+            Mail::to($validated['to'])->send(new PasswordResetOtpEmail(
+                $validated['data']['user_name'] ?? 'User',
+                $validated['data']['otp'],
+                $validated['data']['expires_in_minutes'] ?? 10
+            ));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('OTP send failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP'
             ], 500);
         }
     }

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Mail\LoginSuccessEmail;
 use App\Mail\PasswordResetEmail;
+use App\Mail\PasswordResetOtpEmail;
 use Illuminate\Support\Facades\Mail;
 
 trait IdentityEmailTrait
@@ -22,6 +23,15 @@ trait IdentityEmailTrait
         Mail::to($recipient)->send(new PasswordResetEmail(
             $data['user_name'] ?? 'User',
             $data['reset_url'] ?? ''
+        ));
+    }
+
+    public function sendPasswordResetOtpEmail($recipient, $data)
+    {
+        Mail::to($recipient)->send(new PasswordResetOtpEmail(
+            $data['user_name'] ?? 'User',
+            $data['otp'],
+            $data['expires_in_minutes'] ?? 10
         ));
     }
 }

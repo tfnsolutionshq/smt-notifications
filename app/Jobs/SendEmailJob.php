@@ -32,6 +32,8 @@ class SendEmailJob implements ShouldQueue
                 $this->sendLoginEmail($this->recipient, $this->data);
             } elseif ($this->log->service === 'identity' && $this->log->action === 'reset_password_request') {
                 $this->sendPasswordResetEmail($this->recipient, $this->data);
+            } elseif ($this->log->service === 'identity' && $this->log->action === 'forgot_password_otp') {
+                $this->sendPasswordResetOtpEmail($this->recipient, $this->data);
             } elseif ($this->log->service === 'memo-service' && ($this->log->action === 'memo_created' || $this->log->action === 'memo')) {
                 $this->sendMemoCreatedEmail($this->recipient, $this->data);
             }
