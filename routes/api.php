@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\InAppNotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
@@ -38,6 +39,15 @@ Route::prefix('v1')->group(function () {
     Route::post('share-memo', [NotificationController::class, 'shareMemo']);
     Route::post('forward-memo', [NotificationController::class, 'forwardMemo']);
     Route::post('send-otp', [NotificationController::class, 'sendOtp']);
+
+    // In-app notifications
+    Route::post('in-app-notifications', [InAppNotificationController::class, 'create']);
+    Route::post('/notifications/bulk', [InAppNotificationController::class, 'createBulk']);
+    Route::get('notifications/{user_id}', [InAppNotificationController::class, 'getUserNotifications']);
+    Route::put('notifications/{notification_id}/read', [InAppNotificationController::class, 'markAsRead']);
+    Route::put('notifications/{user_id}/read-all', [InAppNotificationController::class, 'markAllAsRead']);
+    Route::get('notifications/{user_id}/unread-count', [InAppNotificationController::class, 'getUnreadCount']);
+    Route::post('notifications/create', [InAppNotificationController::class, 'create']);
 
     Route::get('test', function () {
         Mail::to('promisedeco24@gmail.com')->send(new LoginSuccessEmail(

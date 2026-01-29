@@ -4,15 +4,18 @@ namespace App\Services;
 
 use App\Models\NotificationTemplate;
 use App\Models\NotificationLog;
-use App\Jobs\SendEmailJob;
 use App\Mail\MemoNotification;
+use App\Mail\PasswordResetOtpEmail;
 use App\Services\IdentityClient;
+use App\Traits\IdentityEmailTrait;
+use App\Traits\MemoEmailTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 
 class NotificationService
 {
+    use IdentityEmailTrait, MemoEmailTrait;
     protected $identityClient;
 
     public function __construct(IdentityClient $identityClient)
@@ -23,6 +26,8 @@ class NotificationService
     public function send(string $service, string $action, string $recipient, array $data = [], string $type = 'email'): bool
     {
         try {
+            Log::info("Notification send called", ['service' => $service, 'action' => $action, 'recipient' => $recipient]);
+            
             $email = $recipient;
 
             if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
@@ -44,13 +49,25 @@ class NotificationService
             ]);
 
             if ($type === 'email') {
-                SendEmailJob::dispatch($log, $email, 'Notification', 'Email notification', $data);
+                if ($service === 'identity' && $action === 'login') {
+                    $this->sendLoginEmail($email, $data);
+                } elseif ($service === 'identity' && $action === 'reset_password_request') {
+                    $this->sendPasswordResetEmail($email, $data);
+                } elseif ($service === 'identity' && $action === 'forgot_password_otp') {
+                    $this->sendPasswordResetOtpEmail($email, $data);
+                } elseif ($service === 'memo-service' && ($action === 'memo_created' || $action === 'memo')) {
+                    $this->sendMemoCreatedEmail($email, $data);
+                }
+
+                $log->update(['status' => 'sent', 'sent_at' => now()]);
             }
 
+            Log::info("Notification sent successfully");
             return true;
 
         } catch (\Exception $e) {
             Log::error("Notification failed: " . $e->getMessage());
+            Log::error("Stack trace: " . $e->getTraceAsString());
 
             if (isset($log)) {
                 $log->update([
