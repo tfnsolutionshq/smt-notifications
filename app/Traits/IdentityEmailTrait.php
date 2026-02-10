@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Mail\LoginSuccessEmail;
 use App\Mail\PasswordResetEmail;
 use App\Mail\PasswordResetOtpEmail;
+use App\Mail\WelcomeEmail;
 use Illuminate\Support\Facades\Mail;
 
 trait IdentityEmailTrait
@@ -32,6 +33,15 @@ trait IdentityEmailTrait
             $data['user_name'] ?? 'User',
             $data['otp'],
             $data['expires_in_minutes'] ?? 10
+        ));
+    }
+
+    public function sendUserCreatedEmail($recipient, $data)
+    {
+        Mail::to($recipient)->send(new WelcomeEmail(
+            $data['user_name'] ?? 'User',
+            $data['email'],
+            $data['password']
         ));
     }
 }

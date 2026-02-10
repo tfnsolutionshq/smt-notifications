@@ -11,9 +11,9 @@ class WelcomeEmail extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $first_name,
+        public string $user_name,
         public string $email,
-        public string $department
+        public string $password
     ) {}
 
     public function build()

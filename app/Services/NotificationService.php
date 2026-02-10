@@ -55,6 +55,8 @@ class NotificationService
                     $this->sendPasswordResetEmail($email, $data);
                 } elseif ($service === 'identity' && $action === 'forgot_password_otp') {
                     $this->sendPasswordResetOtpEmail($email, $data);
+                } elseif ($service === 'identity' && $action === 'user_created') {
+                    $this->sendUserCreatedEmail($email, $data);
                 } elseif ($service === 'memo-service' && ($action === 'memo_created' || $action === 'memo')) {
                     $this->sendMemoCreatedEmail($email, $data);
                 }
