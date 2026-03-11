@@ -24,7 +24,7 @@ class NotificationController extends Controller
         try {
             $validated = $request->validate([
                 'service' => 'required|string',
-                'action' => 'required|in:login,register,reset_password_request,reset_password,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,forgot_password_otp,user_created',
+                'action' => 'required|in:login,register,reset_password_request,reset_password,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,forgot_password_otp,user_created,admin_password_reset',
                 'recipient' => 'required',
                 'data' => 'required|array',
                 'type' => 'required|in:email'
@@ -65,7 +65,7 @@ class NotificationController extends Controller
         try {
             $validated = $request->validate([
                 'service' => 'required|string',
-                'action' => 'required|in:approval_required,memo_created,workflow_step_moved,approval_action_taken,workflow_completed',
+                'action' => 'required|in:approval_required,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,admin_password_reset',
                 'role_id' => 'required|string',
                 'data' => 'required|array',
                 'type' => 'required|in:email'

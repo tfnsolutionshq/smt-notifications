@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Mail\AdminPasswordResetEmail;
 use App\Mail\LoginSuccessEmail;
 use App\Mail\PasswordResetEmail;
 use App\Mail\PasswordResetOtpEmail;
@@ -23,6 +24,15 @@ trait IdentityEmailTrait
     {
         Mail::to($recipient)->send(new PasswordResetEmail(
             $data['user_name'] ?? 'User',
+            $data['reset_url'] ?? ''
+        ));
+    }
+
+    public function sendAdminPasswordResetEmail($recipient, $data)
+    {
+        Mail::to($recipient)->send(new AdminPasswordResetEmail(
+            $data['user_name'] ?? 'User',
+            $data['admin_name'] ?? 'Administrator',
             $data['reset_url'] ?? ''
         ));
     }

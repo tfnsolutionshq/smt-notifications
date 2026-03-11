@@ -53,6 +53,8 @@ class NotificationService
                     $this->sendLoginEmail($email, $data);
                 } elseif ($service === 'identity' && $action === 'reset_password_request') {
                     $this->sendPasswordResetEmail($email, $data);
+                } elseif ($service === 'identity' && $action === 'admin_password_reset') {
+                    $this->sendAdminPasswordResetEmail($email, $data);
                 } elseif ($service === 'identity' && $action === 'forgot_password_otp') {
                     $this->sendPasswordResetOtpEmail($email, $data);
                 } elseif ($service === 'identity' && $action === 'user_created') {
