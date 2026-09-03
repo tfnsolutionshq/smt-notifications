@@ -13,8 +13,13 @@ class WelcomeEmail extends Mailable
     public function __construct(
         public string $user_name,
         public string $email,
-        public string $password
-    ) {}
+        public string $password,
+        public ?string $login_url = null
+    ) {
+        if (!$this->login_url) {
+            $this->login_url = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/') . '/login';
+        }
+    }
 
     public function build()
     {

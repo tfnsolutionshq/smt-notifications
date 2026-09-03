@@ -48,10 +48,13 @@ trait IdentityEmailTrait
 
     public function sendUserCreatedEmail($recipient, $data)
     {
+        $loginUrl = $data['login_url'] ?? (rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/') . '/login');
+
         Mail::to($recipient)->send(new WelcomeEmail(
             $data['user_name'] ?? 'User',
             $data['email'],
-            $data['password']
+            $data['password'],
+            $loginUrl
         ));
     }
 }
