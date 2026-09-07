@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\NotificationService;
 use App\Mail\ExternalMemoShareEmail;
 use App\Mail\ExternalMemoForwardedEmail;
+use App\Mail\ExternalMemoRecordedEmail;
+use App\Mail\ExternalMemoCompletedEmail;
 use App\Mail\PasswordResetOtpEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -238,6 +240,78 @@ class NotificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send OTP'
+            ], 500);
+        }
+    }
+
+    public function recordMemo(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'to' => 'required|email',
+                'subject' => 'required|string',
+                'template' => 'required|string',
+                'data' => 'required|array'
+            ]);
+
+            if ($validated['template'] === 'external_memo_recorded') {
+                Mail::to($validated['to'])->send(new ExternalMemoRecordedEmail(
+                    $validated['data']['sender_organization'] ?? '',
+                    $validated['data']['memo_subject'] ?? '',
+                    $validated['data']['tracking_id'] ?? '',
+                    $validated['data']['reference_number'] ?? null,
+                    $validated['data']['date_received'] ?? now()->format('Y-m-d'),
+                    $validated['data']['tracking_url'] ?? null
+                ));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Email send failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send email',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function completeMemo(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'to' => 'required|email',
+                'subject' => 'required|string',
+                'template' => 'required|string',
+                'data' => 'required|array'
+            ]);
+
+            if ($validated['template'] === 'external_memo_completed') {
+                Mail::to($validated['to'])->send(new ExternalMemoCompletedEmail(
+                    $validated['data']['sender_organization'] ?? '',
+                    $validated['data']['memo_subject'] ?? '',
+                    $validated['data']['tracking_id'] ?? '',
+                    $validated['data']['reference_number'] ?? null,
+                    $validated['data']['completed_at'] ?? now()->format('Y-m-d H:i:s'),
+                    $validated['data']['tracking_url'] ?? null
+                ));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Email send failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send email',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

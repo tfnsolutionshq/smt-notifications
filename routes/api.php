@@ -38,6 +38,8 @@ Route::prefix('v1')->group(function () {
     Route::post('notifications/send-to-role', [NotificationController::class, 'sendToRole']);
     Route::post('share-memo', [NotificationController::class, 'shareMemo']);
     Route::post('forward-memo', [NotificationController::class, 'forwardMemo']);
+    Route::post('record-memo', [NotificationController::class, 'recordMemo']);
+    Route::post('complete-memo', [NotificationController::class, 'completeMemo']);
     Route::post('send-otp', [NotificationController::class, 'sendOtp']);
 
     // In-app notifications
