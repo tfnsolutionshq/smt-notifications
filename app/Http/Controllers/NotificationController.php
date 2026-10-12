@@ -26,7 +26,7 @@ class NotificationController extends Controller
         try {
             $validated = $request->validate([
                 'service' => 'required|string',
-                'action' => 'required|in:login,register,reset_password_request,reset_password,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,forgot_password_otp,user_created,admin_password_reset',
+                'action' => 'required|in:login,register,reset_password_request,reset_password,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,forgot_password_otp,user_created,admin_password_reset,approval_required,review_required,notification_step',
                 'recipient' => 'required',
                 'data' => 'required|array',
                 'type' => 'required|in:email'
@@ -67,7 +67,7 @@ class NotificationController extends Controller
         try {
             $validated = $request->validate([
                 'service' => 'required|string',
-                'action' => 'required|in:approval_required,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,admin_password_reset',
+                'action' => 'required|in:approval_required,review_required,notification_step,memo_created,workflow_step_moved,approval_action_taken,workflow_completed,admin_password_reset',
                 'role_id' => 'required|string',
                 'data' => 'required|array',
                 'type' => 'required|in:email'
@@ -96,55 +96,6 @@ class NotificationController extends Controller
 
 
     public function shareMemo(Request $request)
-{
-    try {
-        $validated = $request->validate([
-            'to' => 'required|email',
-            'subject' => 'required|string',
-            'template' => 'required|string',
-            'data' => 'required|array'
-        ]);
-
-        if ($validated['template'] === 'external_memo_share') {
-            Log::info('Email data:', $validated['data']);
-
-            $mailable = new ExternalMemoShareEmail(
-                $validated['data']['tracking_id'],
-                $validated['data']['tracking_url'],
-                $validated['data']['memo_subject'],
-                $validated['data']['reference_number'],
-                $validated['data']['status'],
-                $validated['data']['timeline'] ?? [],
-                $validated['data']['message'] ?? null
-            );
-
-            Log::info('Mailable properties:', [
-                'tracking_id' => $mailable->tracking_id,
-                'memo_subject' => $mailable->memo_subject,
-                'status' => $mailable->status,
-            ]);
-
-            Mail::to($validated['to'])->send($mailable);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Email sent successfully'
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error('Email send failed: ' . $e->getMessage());
-        Log::error('Stack trace: ' . $e->getTraceAsString());
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to send email',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-
-    public function shareMemo2(Request $request)
     {
         try {
             $validated = $request->validate([
@@ -155,15 +106,25 @@ class NotificationController extends Controller
             ]);
 
             if ($validated['template'] === 'external_memo_share') {
-                Mail::to($validated['to'])->send(new ExternalMemoShareEmail(
+                Log::info('Email data:', $validated['data']);
+
+                $mailable = new ExternalMemoShareEmail(
                     $validated['data']['tracking_id'],
                     $validated['data']['tracking_url'],
                     $validated['data']['memo_subject'],
                     $validated['data']['reference_number'],
                     $validated['data']['status'],
                     $validated['data']['timeline'] ?? [],
-                    $validated['data']['message'] ?? null
-                ));
+                    $validated['data']['share_message'] ?? $validated['data']['message'] ?? null
+                );
+
+                Log::info('Mailable properties:', [
+                    'tracking_id' => $mailable->tracking_id,
+                    'memo_subject' => $mailable->memo_subject,
+                    'status' => $mailable->status,
+                ]);
+
+                Mail::to($validated['to'])->send($mailable);
             }
 
             return response()->json([
@@ -173,9 +134,11 @@ class NotificationController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Email send failed: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send email'
+                'message' => 'Failed to send email',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

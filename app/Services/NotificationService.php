@@ -61,6 +61,8 @@ class NotificationService
                     $this->sendUserCreatedEmail($email, $data);
                 } elseif ($service === 'memo-service' && ($action === 'memo_created' || $action === 'memo')) {
                     $this->sendMemoCreatedEmail($email, $data);
+                } elseif ($service === 'memo-service') {
+                    Mail::to($email)->send(new MemoNotification($action, $data));
                 }
 
                 $log->update(['status' => 'sent', 'sent_at' => now()]);

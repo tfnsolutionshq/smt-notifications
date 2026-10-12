@@ -15,7 +15,7 @@ class MemoNotification extends Mailable implements ShouldQueue
     protected $data;
     protected $user;
 
-    public function __construct($action, $data, $user)
+    public function __construct($action, $data, $user = null)
     {
         $this->action = $action;
         $this->data = $data;
@@ -40,6 +40,10 @@ class MemoNotification extends Mailable implements ShouldQueue
                 return 'New Memo: ' . ($this->data['memo_subject'] ?? 'Untitled');
             case 'approval_required':
                 return 'Approval Required: ' . ($this->data['memo_subject'] ?? 'Untitled');
+            case 'review_required':
+                return 'Review Required: ' . ($this->data['memo_subject'] ?? 'Untitled');
+            case 'notification_step':
+                return 'Notification: ' . ($this->data['memo_subject'] ?? 'Untitled');
             case 'workflow_step_moved':
                 return 'Memo Updated: ' . ($this->data['memo_subject'] ?? 'Untitled');
             case 'approval_action_taken':
@@ -58,6 +62,10 @@ class MemoNotification extends Mailable implements ShouldQueue
                 return "You have received a new memo: {$this->data['memo_subject']} from {$this->data['sender_name']}";
             case 'approval_required':
                 return "Memo '{$this->data['memo_subject']}' requires your approval at step: {$this->data['workflow_step']}";
+            case 'review_required':
+                return "Memo '{$this->data['memo_subject']}' requires your review at step: {$this->data['workflow_step']}";
+            case 'notification_step':
+                return "Memo '{$this->data['memo_subject']}' notification at step: {$this->data['workflow_step']}";
             case 'workflow_step_moved':
                 return "Memo '{$this->data['memo_subject']}' has moved to workflow step: {$this->data['workflow_step']}";
             case 'approval_action_taken':

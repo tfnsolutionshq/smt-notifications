@@ -7,10 +7,10 @@
     <p style="margin: 0; color: #2e7d32; font-weight: bold;">📄 An external memo has been shared with you</p>
 </div>
 
-@if(!empty($message))
+@if(!empty($share_message))
 <div style="background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #ff9800;">
     <strong>Message:</strong>
-    <p style="margin: 10px 0 0 0; color: #333;">{{ $message }}</p>
+    <p style="margin: 10px 0 0 0; color: #333;">{{ $share_message }}</p>
 </div>
 @endif
 
@@ -42,10 +42,12 @@
 <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
     @foreach($timeline as $index => $event)
     <div style="padding: 10px 0; {{ $index < count($timeline) - 1 ? 'border-bottom: 1px solid #dee2e6;' : '' }}">
-        <div style="color: #666; font-size: 12px;">{{ $event['date'] ?? '' }}</div>
+        <div style="color: #666; font-size: 12px;">{{ $event['date'] ?? $event['date_time'] ?? '' }}</div>
         <div style="color: #333; font-weight: bold; margin: 5px 0;">{{ $event['action'] ?? '' }}</div>
         @if(isset($event['location']))
         <div style="color: #666; font-size: 14px;">{{ $event['location'] }}</div>
+        @elseif(isset($event['department']))
+        <div style="color: #666; font-size: 14px;">{{ $event['department'] }}</div>
         @endif
     </div>
     @endforeach

@@ -29,10 +29,15 @@ class IdentityClient
             ->json();
     }
 
-    public function getUsersByDepartment($departmentId)
+    public function getUsersByDepartment($departmentId, ?string $search = null)
     {
+        $payload = ['department_id' => $departmentId];
+        if (!empty($search)) {
+            $payload['search'] = $search;
+        }
+
         return Http::withHeaders(['X-Service-Key' => $this->apiKey])
-            ->post("{$this->baseUrl}/users-by-department", ['department_id' => $departmentId])
+            ->post("{$this->baseUrl}/users-by-department", $payload)
             ->json();
     }
 

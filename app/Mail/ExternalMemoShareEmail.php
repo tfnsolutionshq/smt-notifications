@@ -17,13 +17,16 @@ class ExternalMemoShareEmail extends Mailable
         public string $reference_number,
         public string $status,
         public array $timeline,
-        public ?string $message = null
+        public ?string $share_message = null
     ) {}
 
     public function build()
     {
         return $this->view('emails.external-memo-share')
-                    ->with(['email_subject' => 'External Memo Shared: ' . $this->memo_subject])
+                    ->with([
+                        'email_subject' => 'External Memo Shared: ' . $this->memo_subject,
+                        'share_message' => $this->share_message,
+                    ])
                     ->subject('External Memo Shared: ' . $this->memo_subject);
     }
 
